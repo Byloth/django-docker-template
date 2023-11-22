@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "happy"
+version = "1.0.0"
+description = "A template of a ready-to-use dockerized Django application. 😄"
+authors = ["Matteo Bilotta <me@byloth.dev>"]
+license = "Apache-2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+django = "^4.2.7"
+hiredis = "^2.2.3"
+psycopg = {extras = ["binary", "pool"], version = "^3.1.13"}
+redis = "^5.0.1"
+
+[tool.poetry.dev-dependencies]
+pylint = "^3.0.2"
+pylint-django = "^2.5.5"
+pytest = "^7.4.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

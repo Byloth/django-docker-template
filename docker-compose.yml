@@ -1,0 +1,57 @@
+name: happy
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16.1-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres00
+
+    networks:
+      - default
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.2-alpine
+    networks:
+      - default
+
+    volumes:
+      - redis_data:/data
+
+  django:
+    build: .
+    image: byloth/happy:latest
+    depends_on:
+      - postgres
+      - redis
+
+    command: django
+    env_file:
+      - .env
+
+    environment:
+      PGHOST: postgres
+      PGUSER: happy
+      PGPASSWORD: happy00
+      REDIS_HOST: redis
+      SECRET_KEY: yet_not_a_very_secure_secret_key
+
+    networks:
+      - default
+
+    ports:
+      - 8000:8000
+
+    volumes:
+      - django_data:/var/lib/happy
+      - ./src:/opt/happy
+
+networks:
+  default:
+
+volumes:
+  django_data:
+  postgres_data:
+  redis_data:

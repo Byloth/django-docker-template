@@ -1,0 +1,38 @@
+# Files created by OS
+#
+**/.DS_Store
+**/Desktop.ini
+
+# Files created by IDE
+#
+.idea/
+.vscode/
+
+*.code-workspace
+
+# Generated & compiled files
+#
+**/__pycache__/
+**/*.pyc
+
+# Environmental files
+#
+**/.env
+
+# GIT files
+#
+.git/
+
+**/.gitignore
+
+# Docker & build files
+#
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Other project files
+#
+.editorconfig
+LICENSE
+README.md
