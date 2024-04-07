@@ -6,43 +6,43 @@ set -e
 HELP="
 Runs the \"Happy\" application.
 
-By default, it runs using uWSGI server.
+By default, it runs using Uvicorn ASGI web server.
 For other run mode, please read the following command line options:
 
 Usage:
     docker run ... [MODE] [OPTIONS]
 
 Modes:
-    init          Force the setup of the environment to run the application properly.
-                  This command runs automatically when the application is
-                   executed for the first time or following an update
-                   so you usually don't need to run it manually.
+    init            Force the setup of the environment to run the application properly.
+                    This command runs automatically when the application is
+                     executed for the first time or following an update
+                     so you usually don't need to run it manually.
 
-                  Practically, it runs 'python manage.py collectstatic' and
-                   changes the ownership of the \${DATA_VOLUME} to 'happy:happy'.
+                    Practically, it runs 'python manage.py collectstatic' and
+                     changes the ownership of the \${DATA_VOLUME} to 'www-data:www-data'.
 
-    -- | uwsgi    Runs the backend application using uWSGI server.
-                  This is the default run mode.
+    -- | uvicorn    Runs the backend application using Uvicorn ASGI web server.
+                    This is the default run mode.
 
-    django        Runs the backend application using Django.
-                  This is only for development purpose
-                   and always runs in \${DEBUG} mode.
+    django          Runs the backend application using Django.
+                    This is only for development purpose
+                     and always runs in \${DEBUG} mode.
 
-                  Practically, this mode runs 'python manage.py runserver'.
-                  If you'll pass any other argument, it will be directly passed to
-                   'manage.py' script, allowing you to run any available Django command.
+                    Practically, this mode runs 'python manage.py runserver'.
+                    If you'll pass any other argument, it will be directly passed to
+                     'manage.py' script, allowing you to run any available Django command.
 
-                      e.g. 'docker run ... django createsuperuser' -> 'python manage.py createsuperuser'
+                        e.g. 'docker run ... django createsuperuser' -> 'python manage.py createsuperuser'
 
-    *             Any other value will be treated as a normal
-                   command to execute inside the Docker container.
+    *               Any other value will be treated as a normal
+                     command to execute inside the Docker container.
 
 Options:
     --debug             Runs the backend application in \${DEBUG} mode.
 
     -h | -? | --help    Prints this help message."
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 #
 # Functions:
@@ -62,7 +62,7 @@ function init-check()
 }
 function init-force()
 {
-    chown -R happy:happy "${DATA_VOLUME}"
+    chown -R www-data:www-data "${DATA_VOLUME}"
     python manage.py collectstatic --noinput
 
     echo "${VERSION}" > "${DATA_VOLUME}/.version"
@@ -79,7 +79,7 @@ function run-django()
 
     python manage.py ${@}
 }
-function run-uwsgi()
+function run-uvicorn()
 {
     local ARGS=()
 
@@ -98,7 +98,16 @@ function run-uwsgi()
     done
 
     set -- "${ARGS[@]}"
-    uwsgi --ini uwsgi.ini ${@}
+
+    if [[ -n "${DEBUG}" ]]
+    then
+        local RELOAD="--reload"
+    fi
+
+    su-exec www-data uvicorn do_you_dare.asgi:application --host "0.0.0.0" \
+                                                          --port 8000 \
+                                                          \
+                                                          ${RELOAD} ${@}
 }
 
 #
@@ -123,13 +132,13 @@ case "${1}" in
 
         ;;
 
-    -- | uwsgi)
+    -- | uvicorn)
         shift
-        run-uwsgi ${@}
+        run-uvicorn ${@}
 
         ;;
     -*)
-        run-uwsgi ${@}
+        run-uvicorn ${@}
 
         ;;
     *)

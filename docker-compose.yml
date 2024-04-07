@@ -1,8 +1,7 @@
 name: happy
-version: "3.9"
 services:
   postgres:
-    image: postgres:16.1-alpine
+    image: postgres:16.2-alpine
     environment:
       POSTGRES_PASSWORD: postgres00
 
@@ -28,9 +27,6 @@ services:
       - redis
 
     command: django
-    env_file:
-      - .env
-
     environment:
       PGHOST: postgres
       PGUSER: happy

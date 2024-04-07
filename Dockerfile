@@ -1,15 +1,12 @@
-FROM ubuntu:22.04 AS builder
+FROM alpine:3.19 AS builder
 
-ENV DEBIAN_FRONTEND="noninteractive"
-RUN apt-get update \
- && apt-get install --no-install-recommends \
-                    --yes \
-        \
-        ca-certificates \
+RUN apk add --no-cache \
         curl \
-        python3 \
- \
- && rm -rf /var/lib/apt/lists/*
+        gcc \
+        musl-dev \
+        postgresql-dev \
+        python3-dev \
+        py3-pip
 
 ENV POETRY_HOME="/opt/poetry"
 ENV POETRY_VIRTUALENVS_CREATE="false"
@@ -32,41 +29,35 @@ RUN poetry install --no-ansi \
  \
  && rm -rf /root/.cache
 
-FROM ubuntu:22.04 AS runner
+FROM alpine:3.19 AS runner
 
-ENV DEBIAN_FRONTEND="noninteractive"
+ARG LANGUAGE="C.UTF-8"
+ENV LANG="${LANGUAGE}"
+ENV LANGUAGE="${LANGUAGE}"
+ENV LC_ALL="${LANGUAGE}"
 
 ARG TIMEZONE="Etc/UTC"
 ENV TZ="${TIMEZONE}"
-RUN apt-get update \
- && apt-get install --no-install-recommends \
-                    --yes \
-        \
-        tzdata \
- \
- && ln -snf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime \
- && echo "${TIMEZONE}" > /etc/timezone \
- && dpkg-reconfigure --frontend "noninteractive" \
-        tzdata \
- \
- && apt-get install --no-install-recommends \
-                    --yes \
-        \
-        gosu \
+
+RUN apk add --no-cache \
+        bash \
         postgresql-client \
         python3 \
-        uwsgi \
-        uwsgi-plugin-python3 \
-        wait-for-it \
+        su-exec \
+        tzdata \
  \
- && ln -s /usr/bin/python3 /usr/local/bin/python \
- && rm -rf /var/lib/apt/lists/*
+ && ln -s /usr/bin/python3 /usr/local/bin/python3
 
-RUN useradd --comment "Happy" \
-            --no-create-home \
-            --user-group happy
+RUN adduser -h /var/www \
+            -s /bin/bash \
+            -u 82 \
+            -G www-data \
+            -D \
+        \
+        www-data
 
-COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
+COPY --from=builder /usr/lib/python3.11/site-packages /usr/lib/python3.11/site-packages
+COPY --from=builder /usr/bin/uvicorn /usr/local/bin/uvicorn
 
 WORKDIR "/opt/happy"
 COPY src/ ./
@@ -84,7 +75,7 @@ ENV PGPASSWORD=""
 ENV PGDATABASE="happy"
 
 ENTRYPOINT ["./entrypoint.sh"]
-CMD ["uwsgi"]
+CMD ["uvicorn"]
 
 EXPOSE 8000
 VOLUME ["${DATA_VOLUME}"]
