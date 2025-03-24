@@ -1,32 +1,37 @@
-[tool.poetry]
+[project]
 name = "happy"
-version = "1.1.0"
+version = "1.2.0"
 description = "A template of a ready-to-use dockerized Django application. 😄"
-authors = ["Matteo Bilotta <me@byloth.dev>"]
-license = "Apache-2.0"
+authors = [
+    {name = "Matteo Bilotta",email = "me@byloth.dev"}
+]
+license = {text = "Apache-2.0"}
 readme = "README.md"
+requires-python = ">=3.12,<4.0.0"
+dependencies = [
+    "channels (>=4.2.0,<5.0.0)",
+    "channels-redis (>=4.2.1,<5.0.0)",
+    "daphne (>=4.1.2,<5.0.0)",
+    "django (>=5.1.7,<6.0.0)",
+    "psycopg[binary,pool] (>=3.2.6,<4.0.0)",
+    "redis[hiredis] (>=5.2.1,<6.0.0)",
+    "twisted[http2,tls] (>=24.11.0,<25.0.0)",
+    "uvicorn[standard] (>=0.34.0,<0.35.0)",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-channels = "^4.1.0"
-channels-redis = "^4.2.0"
-daphne = "^4.1.0"
-django = "^5.0.4"
-psycopg = {extras = ["binary", "pool"], version = "^3.1.18"}
-redis = {extras = ["hiredis"], version = "^5.0.3"}
-twisted = {extras = ["http2", "tls"], version = "^24.3.0"}
-uvicorn = {extras = ["standard"], version = "^0.29.0"}
+[tool.poetry]
 
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.3.6"
+pytest = "^8.3.5"
+pylint-django = "^2.6.1"
+
+[tool.poetry.group.prod.dependencies]
 # SMELLS: Inside the Docker container, `setuptools` will be added by `apk` to this specific version.
 #         This line forces `poetry` to keep this version without trying to upgrade it (which would fail).
 #
 setuptools = "68.2.2"
 
-[tool.poetry.dev-dependencies]
-pylint = "^3.1.0"
-pylint-django = "^2.5.5"
-pytest = "^8.1.1"
-
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
