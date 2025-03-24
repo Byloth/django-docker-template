@@ -39,7 +39,7 @@ ALLOWED_HOSTS = ['*'] if DEBUG else os.environ.get('HOSTNAME').split(",")
 # CSRF trusted origins
 # https://docs.djangoproject.com/en/5.1/ref/settings/#csrf-trusted-origins
 
-CSRF_TRUSTED_ORIGINS = list(map(lambda url: f"https://{url}", ALLOWED_HOSTS))
+CSRF_TRUSTED_ORIGINS = list(map(lambda host: f"https://{host}", ALLOWED_HOSTS))
 
 
 # Application definition
