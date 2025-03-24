@@ -104,10 +104,10 @@ function run-uvicorn()
         local RELOAD="--reload"
     fi
 
-    su-exec www-data uvicorn do_you_dare.asgi:application --host "0.0.0.0" \
-                                                          --port 8000 \
-                                                          \
-                                                          ${RELOAD} ${@}
+    su-exec www-data uvicorn happy.asgi:application --host "0.0.0.0" \
+                                                    --port 8000 \
+                                                    \
+                                                    ${RELOAD} ${@}
 }
 
 #

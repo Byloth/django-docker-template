@@ -1,4 +1,4 @@
-FROM alpine:3.19 AS builder
+FROM alpine:3.21 AS builder
 
 RUN apk add --no-cache \
         curl \
@@ -25,11 +25,11 @@ COPY poetry.lock ./
 RUN poetry install --no-ansi \
                    --no-cache \
                    --no-root \
-                   --only main \
+                   --with prod \
  \
  && rm -rf /root/.cache
 
-FROM alpine:3.19 AS runner
+FROM alpine:3.21 AS runner
 
 ARG LANGUAGE="C.UTF-8"
 ENV LANG="${LANGUAGE}"
@@ -56,7 +56,7 @@ RUN adduser -h /var/www \
         \
         www-data
 
-COPY --from=builder /usr/lib/python3.11/site-packages /usr/lib/python3.11/site-packages
+COPY --from=builder /usr/lib/python3.12/site-packages /usr/lib/python3.12/site-packages
 COPY --from=builder /usr/bin/uvicorn /usr/local/bin/uvicorn
 
 WORKDIR "/opt/happy"

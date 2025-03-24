@@ -1,7 +1,7 @@
 name: happy
 services:
   postgres:
-    image: postgres:16.2-alpine
+    image: postgres:17.4-alpine
     environment:
       POSTGRES_PASSWORD: postgres00
 
@@ -12,7 +12,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
-    image: redis:7.2-alpine
+    image: redis:7.4-alpine
     networks:
       - default
 
