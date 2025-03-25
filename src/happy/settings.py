@@ -33,7 +33,7 @@ DEBUG = bool(os.environ.get('DEBUG'))
 # Allowed hosts
 # https://docs.djangoproject.com/en/5.1/ref/settings/#allowed-hosts
 
-ALLOWED_HOSTS = ['*'] if DEBUG else os.environ.get('HOSTNAME').split(",")
+ALLOWED_HOSTS = ['*'] if DEBUG else (os.environ.get('HOSTNAME') or "").split(",")
 
 
 # CSRF trusted origins
