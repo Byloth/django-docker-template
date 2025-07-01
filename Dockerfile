@@ -1,4 +1,4 @@
-FROM alpine:3.21 AS builder
+FROM alpine:3.22 AS builder
 
 RUN apk add --no-cache \
         curl \
@@ -29,7 +29,7 @@ RUN poetry install --no-ansi \
  \
  && rm -rf /root/.cache
 
-FROM alpine:3.21 AS runner
+FROM alpine:3.22 AS runner
 
 ARG LANGUAGE="C.UTF-8"
 ENV LANG="${LANGUAGE}"
